@@ -1,0 +1,19 @@
+.btn-right{
+  margin-left: 90%;
+}
+
+.image-item{
+  width: 60%;
+  height: 80%;
+  object-fit: cover;
+  margin: 10px;
+}
+.image-container{
+  /* display: flex; */
+  /* flex-wrap: wrap; */
+}
+.container{
+  /* display: flex; */
+  align-items: center;
+  margin: auto;
+}

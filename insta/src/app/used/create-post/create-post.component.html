@@ -1,0 +1,18 @@
+<p>create-post works!</p>
+<div>
+  <form (ngSubmit)="onSubmit()" #fileForm="ngForm">
+    <!-- <label> User Name: <input type="text" [(ngModel)]="username" name="username" required>
+    </label> -->
+    <br>
+    <br>
+    <label> Caption: <input type="text" [(ngModel)]="content" name="content" required>
+    </label>
+    <br>
+    <br>
+      <label>Add image</label>
+      <input type="file" (change)="onFileSelected($event)" name="image" required>
+    <br>
+    <br>
+    <button type="submit">Submit</button>
+  </form>
+</div>

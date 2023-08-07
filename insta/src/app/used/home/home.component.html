@@ -1,0 +1,39 @@
+<p>home works!</p>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" routerLink="/posts">Insta</a>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <button (click)="createPost()" type="button" class="btn btn-primary">Create Post</button>
+      </li>
+      <li class="nav-item">
+        <button (click)="logout()" type="button" class="btn btn-danger btn-right">Logout</button>
+      </li>
+    </ul>
+
+  </div>
+</nav>
+<div class="container" *ngFor="let post of posts.reverse()">
+  <div>
+    <h3>{{post.user}}</h3>
+  </div>
+  <br>
+
+  <div>
+    <img class="image-item" [src]="imageurl+post.image">
+  </div>
+  <br>
+  <div>
+    <p>Caption: {{post.content}}</p>
+  </div>
+  <br>
+  <br>
+  <!-- <p>{{isPostLiked(post._id)? 'Already Liked': '' }}</p> -->
+  <button  (click)="like(post._id)" type="button" class="btn btn-primary">{{isPostLiked(post._id)? 'Liked': 'Like' }}</button>
+  <button (click)="viewLikes(post._id)" type="button" class="btn btn-outline-secondary btn-sm">View Likes</button>
+<br>
+<br>
+</div>
+<!-- [disabled]="isPostLiked(post._id)" -->
