@@ -1,0 +1,68 @@
+
+<mat-toolbar class="toolbar">
+  <button mat-icon-button routerLink="/posts">
+    <mat-icon>home</mat-icon>
+  </button>
+  <span class="centre-text">Insta-X</span>
+  <span class="filler"></span>
+  <button mat-icon-button [matMenuTriggerFor]="menu" class="person-icon">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="createPost()">Create-Post</button>
+    <button mat-menu-item (click)="logout()">Logout</button>
+
+  </mat-menu>
+</mat-toolbar>
+
+<div *ngIf="posts.length===0">
+  No Posts Found.
+  <br>
+  Create One From Here.
+  <button mat-stroked-button color="primary" class="btn-block" (click)="createPost()" >Add Post</button>
+</div>
+
+<div class="container" *ngFor="let post of posts; let i= index">
+  <div>
+    <h3>{{post.user}}</h3>
+  </div>
+  <br>
+
+  <div>
+    <img class="image-item" [src]="imageurl+post.image">
+  </div>
+  <br>
+  <div class="post-content">
+    <span *ngIf="post.content.length>4">
+      Caption: {{post.content | slice:0:4 }}{{expandcaption[post._id]? post.content.slice(4):'...'}}
+    </span>
+    <span
+    class="show-more"
+    *ngIf="post.content.length>4" (click)="toggleCaption(post._id)"
+    >{{expandcaption[post._id]?'Show Less':'Show More'}}
+    </span>
+  </div>
+  <!-- <div>
+    <p>Caption: {{post.content}}</p>
+  </div> -->
+  <br>
+  <button mat-icon-button (click)="like(post._id)">
+    <mat-icon  [ngClass]="{'liked': isPostLiked(post._id), 'not-liked':!isPostLiked(post._id)}">{{isPostLiked(post._id)? 'favorite':'favorite_border'}}</mat-icon>
+  </button>
+  <!-- <button  (click)="like(post._id)" type="button" class="btn btn-primary">{{isPostLiked(post._id)? 'Liked': 'Like' }}</button> -->
+  <br>
+
+  <p>
+    <ng-container *ngIf="getLikedBy(post._id).length>0; else noLikes">
+    Liked By: <span *ngFor="let like of getLikedBy(post._id).slice(0,3);let last=last">
+    {{like.user}}{{last? '':','}}
+  </span>
+  {{getOthercount(post._id)>0 ? '&' + getOthercount(post._id):''}}<a (click)="viewLikes(post._id)">{{getOthercount(post._id)>0 ? 'others': ''}}</a>
+  <!-- {{ othersCountArray[i] > 0 ? othersCountArray[i]:''}} <a (click)="viewLikes(post._id)"> {{othersCountArray[i] > 0 ? 'others':''}}</a> -->
+</ng-container>
+<ng-template #noLikes> No Likes.</ng-template>
+</p>
+  <button (click)="deletePost(post._id)" type="button" class="btn btn-danger">Delete</button>
+<br>
+<br>
+</div>

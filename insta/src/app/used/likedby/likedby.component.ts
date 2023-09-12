@@ -25,6 +25,5 @@ export class LikedbyComponent {
     }
   }
   likedUser: any=this.data.likedBy;
-
-
+  count: any=this.data.othersCount;
 }

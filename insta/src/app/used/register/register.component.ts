@@ -2,7 +2,8 @@ import { Component } from '@angular/core';
 import{HttpClient, HttpErrorResponse} from '@angular/common/http';
 import { Router } from '@angular/router';
 import { ApiService } from 'src/app/api.service';
-
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SharedService } from 'src/app/shared.service';
 
 @Component({
   selector: 'app-register',
@@ -10,64 +11,69 @@ import { ApiService } from 'src/app/api.service';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  username?: string;
-  email?: string;
-  password?: string;
-  constructor( private router: Router, private http: HttpClient, private api: ApiService){}
+  registrationForm: FormGroup;
+  passwordMatch=false;
+  constructor( private router: Router,private  shared: SharedService, private http: HttpClient, private api: ApiService, private fb: FormBuilder){
+    this.registrationForm=this.fb.group({
+      username: ['',[Validators.required,Validators.minLength(4)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required,Validators.minLength(8)]],
+      password2:['',[Validators.required]],
+      // {Validators: this.confirmPassword.bind(this)},
+    });
+
+    this.registrationForm.get('password2')?.valueChanges.subscribe(()=>{
+      this.passwordMatch=  this.registrationForm.get('password')?.value!==this.registrationForm.get('password2')?.value;
+
+    })
+
+  }
+
+
+  passwordMatches(){
+    return this.registrationForm.get('password')===this.registrationForm.get('password2');
+  }
+  // confirmPassword(formgroup: FormGroup){
+
+  // }
   errorMessage: String='';
   at='accessToken';
   rt='refreshToken';
   lt='loginTime';
   result: any;
-  errs='Username OR email Already Taken.'
+  errs='Username OR email Already Taken.';
+  showPassword: boolean=false;
+  showPassword2: boolean=false;
   ngOnInit(): void{
 
   }
-
-  onSubmit() {
-
-    const details={
-      username: this.username,
-      email: this.email,
-      password: this.password,
+  show(i:any){
+    if(i==1){
+      this.showPassword = !this.showPassword;
+    }else{
+      this.showPassword2=! this.showPassword2
     }
-    this.username=this.email=this.password='';
-
-    this.api.signup(details).subscribe((response)=>{
-      // console.log(response);
+  }
+  onSubmit() {
+    if(this.registrationForm?.valid){
+      const details= this.registrationForm.value;
+    this.api.signup(details).subscribe((response:any)=>{
       this.errorMessage='';
       if(response){
         this.result=response;
-        const accessToken= this.result.accessToken;
-        const refreshToken= this.result.refreshToken;
+        const accessToken= response.message.accessToken;
+        const refreshToken= response.message.refreshToken;
         const time=(Date.now()/1000);
         localStorage.setItem(this.at,accessToken);
         localStorage.setItem(this.rt,refreshToken);
         localStorage.setItem(this.lt,String(time));
+        this.shared.setUsername(details.username);
         this.router.navigate(['/posts']);
       }
     },(error)=>{
       this.errorMessage=this.errs;
-      // console.log(this.errorMessage)
-
     })
-    // this.http.post(this.url ,details).subscribe((response)=>{
-    //   console.log(response);
-    //   if(response){
-    //     this.router.navigate(['/posts']);
-    //   }else{
-    //     this.errorMessage='Username OR email Already Taken.';
-    //     console.log(this.errorMessage);
-    //   }
-    // },(error)=>{
-    //   return error;
-    // })
-    // console.log('Registration form submitted!');
-    // console.log(`UserName: ${this.username}`);
-    // console.log(`Email: ${this.email}`);
-    // console.log(`Password: ${this.password}`);
-
-// console.log(`password: ${this.password}`);
+  }
 }
 
 

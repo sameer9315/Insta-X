@@ -1,0 +1,143 @@
+<!-- <div  *ngIf="messageList?.length===0; else avl">
+  <strong>Start the Chat </strong>
+  <h1>helloo</h1>
+</div>
+<ng-template #avl> -->
+  <!-- <div *ngFor="let message of messageList">
+    <li>
+        {{message}}
+    </li>
+  </div>
+
+<input
+  [(ngModel)]="newMessage"
+  (keyup)="$event.keyCode == 13 && sendMessage()"
+/>
+<button (click)="sendMessage()">Send Message</button> -->
+
+
+<mat-toolbar class="toolbar stickyBar">
+  <button mat-icon-button routerLink="/posts">
+    <mat-icon>home</mat-icon>
+  </button>
+  <span class="centre-text">Insta-X</span>
+  <span class="filler"></span>
+  <!-- <button mat-icon-button routerLink="/chat" >
+    <mat-icon> chat_bubble_outline</mat-icon>
+  </button> -->
+  <button mat-icon-button [matMenuTriggerFor]="menu" class="person-icon">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="logout()">Logout</button>
+
+  </mat-menu>
+</mat-toolbar>
+<div class="chat-container">
+  <div class="active-users">
+    <h1>Active Users And Joined Groups</h1>
+    <div class="user-list">
+      <div *ngFor="let user of activeUsers" class="user-box" (click)="selectRecipient(user)" [class.selected]="selectedRecipientSocketId===user">
+        {{user}}
+      </div>
+      <div *ngIf="joinedGroups.length>0">
+        <h1>Joined Groups</h1>
+        <div *ngFor="let group of joinedGroups"class="user-box" (click)="groupChat(group)" [class.selected]="selectedGroup===group">
+          {{group}}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="group-management">
+    <h2>Group Management</h2>
+    <input [(ngModel)]="groupName" placeholder="Enter Group Name..."/>
+    <button (click)="createGroup()">Create Group</button>
+    <h3>Available Groups</h3>
+    <ul>
+      <li *ngFor="let group of groupList">
+        {{group}}
+        <span *ngIf="groupJoinedChecker(group)"> : Already Joined</span>
+        <button *ngIf="!groupJoinedChecker(group)" (click)="joinGroup(group)">Join</button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="chat-window">
+    <ng-container *ngIf="selectedRecipientSocketId">
+      <div>
+        <h2>Selected User: {{selectedRecipientSocketId}}</h2>
+      </div>
+      <div class="messages">
+        <div *ngIf="!selectedGroup">
+          <div *ngFor="let message of getpersonalChat()">
+            <div *ngIf="message.sender===username" class="message-sent">
+                {{message.message}}
+            </div>
+            <div *ngIf="message.sender===selectedRecipientSocketId" class="message-received">
+              <span class="message-sender">{{message.sender}}</span>: {{message.message}}
+
+            </div>
+        </div>
+      </div>
+      </div>
+      <div class="input-area">
+        <input [(ngModel)]="newMessage"
+        (keyup)="$event.keyCode == 13 && sendMessage()">
+        <button (click)="sendMessage()">Send Message</button>
+      </div>
+      </ng-container>
+
+      <ng-container *ngIf="selectedGroup">
+        <!-- <h3> Group Members</h3>
+          <ul>
+            <li *ngFor="let member"></li>
+          </ul> -->
+          <h3>Group Chat-{{selectedGroup}}</h3>
+        <button  (click)="leaveGroup()">Leave Group</button>
+        <button (click)="groupMembersView()">View Joined Members</button>
+
+          <div *ngFor="let message of groupChatMessages">
+            <div *ngIf="message.noti ; else sent">
+              <div class="notification">
+              <span *ngIf="message.group===selectedGroup  ">
+                {{message.noti}}
+                <span *ngIf="message.type==='join';else left">
+                  Joined The {{message.group}} Group
+                </span>
+                <ng-template #left>
+                  Left The {{message.group}} Group
+                </ng-template>
+              </span>
+            </div>
+            </div>
+
+            <ng-template #sent>
+              <div *ngIf="message.groupName===selectedGroup">
+              <div *ngIf="message.sender===username  ; else rec" class="message-sent">
+                You: {{message.message}}
+              </div>
+            </div>
+              <ng-template #rec class="message-received">
+              <div *ngIf="message.groupName===selectedGroup">
+                {{message.sender}}:{{message.message}}
+                </div>
+              </ng-template>
+            </ng-template>
+          </div>
+          <div class="input-area">
+            <input [(ngModel)]="newMessage"
+            (keyup)="$event.keyCode == 13 && sendMessage()">
+            <button (click)="sendMessage()">Send Message</button>
+          </div>
+      </ng-container>
+
+      <div *ngIf="!selectedRecipientSocketId && !selectedGroup" >
+        <div  class="select-recipient-msg">
+          Select One to Chat
+        </div>
+      </div>
+
+    </div>
+ </div>
+

@@ -1,4 +1,6 @@
-import { NgModule } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { AngularMaterialModule } from './angular-material.module';
+import { MatInputModule } from '@angular/material/input';
 import { BrowserModule } from '@angular/platform-browser';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatButtonModule} from '@angular/material/button'
@@ -15,6 +17,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { CreatePostComponent } from './used/create-post/create-post.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { LikedbyComponent } from './used/likedby/likedby.component';
+import { UserPostComponent } from './used/user-post/user-post.component';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import {MatIconModule} from '@angular/material/icon';
+import { ChatComponent } from './used/chat/chat.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -23,7 +29,8 @@ import { LikedbyComponent } from './used/likedby/likedby.component';
     SigninComponent,
     RegisterComponent,
     CreatePostComponent,
-    LikedbyComponent
+    LikedbyComponent,
+    UserPostComponent,ChatComponent,
   ],
   imports: [
     BrowserModule,
@@ -31,14 +38,18 @@ import { LikedbyComponent } from './used/likedby/likedby.component';
     },
     {path: 'login', component: SigninComponent},
     {path: 'signup', component: RegisterComponent},
-    {path: 'posts', component: HomeComponent}]),
+    {path: 'posts', component: HomeComponent},
+    {path: 'user', component:UserPostComponent},
+    {path:'chat',component: ChatComponent},
+  ]),
     AppRoutingModule,
     BrowserAnimationsModule,
     FormsModule, ReactiveFormsModule, MatButtonModule, MatFormFieldModule,
     HttpClientModule,
-    MatDialogModule,
+    MatDialogModule,FlexLayoutModule,AngularMaterialModule,MatInputModule,MatIconModule,
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class AppModule { }

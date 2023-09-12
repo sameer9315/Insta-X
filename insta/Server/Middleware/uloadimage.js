@@ -1,9 +1,9 @@
 const multer = require("multer");
-// import { destinationFolder } from "../constants.js";
+const {destinationFolder} = require('./constants');
 
 const storage = multer.diskStorage({
 
-  destination: './public/uploads/',
+  destination: destinationFolder,
 
   filename: (req , file, cb) => {
     const uniqueFileName = Date.now() + "-" + file.originalname;
@@ -12,10 +12,5 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
-
-
-const uploadMiddleware=(req,res,next)=>{
-  
-}
 
 module.exports={upload};

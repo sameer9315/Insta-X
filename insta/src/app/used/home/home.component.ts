@@ -5,6 +5,7 @@ import { CreatePostComponent } from '../create-post/create-post.component';
 import { Router } from '@angular/router';
 import { response } from 'express';
 import { LikedbyComponent } from '../likedby/likedby.component';
+import { ChatComponent } from '../chat/chat.component';
 
 
 @Component({
@@ -20,77 +21,114 @@ export class HomeComponent {
   imageurl='http://localhost:3000/uploads/';
   likedPost: any;
   postLiked: boolean= false;
-
+  likedby: any[]=[];
+  result:any;
+  othersCountArray: any[]=[];
+  isLiked: boolean=false;
+  expandcaption : {[postId: string]:boolean}={};
+  enlargedImage: string | null=null;
+  user:any='';
   constructor(private api:ApiService, private dialog: MatDialog, private router: Router){
 
 
   }
 
   ngOnInit(): void {
-     this.api.fetchall().subscribe((response)=>{
-      this.posts=response;
-      // this.result=response;
-      // console.log(this.posts);
+    this.posts=null;
+    this.likedby=[];
+    this.othersCountArray=[];
+     this.api.fetchall().subscribe((response:any)=>{
+      this.posts=response.message;
       this.errorMessage='';
       this.fetchpostLiked();
+      // console.log(this.posts)
+      this.fetchpostLike();
      },(error)=>{
       this.api.logout();
       this.router.navigate(['/login']);
-      // this.errorMessage='Login Again!! Session Expired';
     });
   }
 
+  toggleCaption(postid:string){
+    this.expandcaption[postid]=!this.expandcaption[postid];
+  }
+  openImageModal(imageurl:string){
+    this.enlargedImage=imageurl;
+  }
+  closeEnlargedImage(){
+    this.enlargedImage=null;
+  }
+
+  getLikedBy(postid:any){
+    const lbyEntry=this.likedby.find(data=>data.postId===postid);
+    return lbyEntry? lbyEntry.likedBy: [];
+  }
+
+  getOthercount(postid: any){
+    const others=this.othersCountArray.find(data=>data.postId===postid);
+    return others.othersCount;
+  }
+
+  fetchpostLike(){
+    for(let i=0;i<this.posts.length;i++){
+       this.api.getLikedUsers(this.posts[i]._id).subscribe((response:any)=>{
+             this.likedby.push({postId: this.posts[i]._id,likedBy: response.message.likedBy});
+             this.othersCountArray.push({postId: this.posts[i]._id,othersCount: response.message.othersCount});
+
+         });
+    }
+    // console.log(this.likedby,this.othersCountArray);
+  }
+
+  showPosts(){
+    this.router.navigate(['/user']);
+  }
+
   private fetchpostLiked(){
-    this.api.getPostsLiked().subscribe((response)=>{
-      this.likedPost=response;
-      // console.log(this.likedPost.posts);
+    this.api.getPostsLiked().subscribe((response:any)=>{
+      this.likedPost=response.message;
+      // console.log(this.likedPost);
     })
   }
 
   isPostLiked(postid:string):boolean{
-    return this.likedPost.posts.some((post: any)=>post._id===postid);
-    // if(liked){
-    //   this.likeButton=!this.likeButton;
-    //  this.likeButton=!this.likeButton;
-
-    //   return true;
-    // }
-    // return false;
+    return this.likedPost.some((post: any)=>post._id===postid);
   }
 
   viewLikes(postid: any){
-    this.api.getLikedUsers(postid).subscribe((response)=>{
-      // console.log(response);
+    this.api.getLikedUsers(postid).subscribe((response:any)=>{
+       this.result=response.message;
       this.dialog.open(LikedbyComponent,{
       maxWidth: '1200px',
       width:'90%',
       data:{
-        likedBy: response,
+        likedBy: this.result.likedBy,
+        othersCount: this.result.othersCount,
       },
     });
     })
-    // console.log('View Clicked')
 
   }
 
   like(postid:any){
-    console.log('LikeClicked');
-    if(this.isPostLiked(postid)){
-      this.api.removeLike(postid).subscribe((response)=>{
-        console.log(response);
-      })
-    }else{
-    this.api.likeit(postid).subscribe((response)=>{
-      console.log(response);
+    // post.isLiked
+    this.api.likeit(postid).subscribe((response:any)=>{
+      // console.log(response);
+      // if(response.message.user){
+      //   isPostLiked(post._id)=!isPostLiked(post._id)
+      // }
     })
-  }
     this.ngOnInit();
   }
 
+  chatPopup(){
+    const dialogRef=this.dialog.open(ChatComponent,{
+      width:'40%',
+    })
+  }
 
   createPost(){
     const accessToken=String(localStorage.getItem('accessToken'));
-    // const refreshToken=String(localStorage.getItem('refreshToken'));
     if(accessToken){
        this.openPopup();
     }else{
@@ -99,23 +137,18 @@ export class HomeComponent {
   }
   openPopup(): void{
     const dialogRef=this.dialog.open(CreatePostComponent,{
-      maxWidth: '1200px',
-      width:'90%',
+      width:'50%',
     });
     dialogRef.afterClosed().subscribe(()=>{
       this.ngOnInit();
     })
-    // this.dialog.open(CreatePostComponent,{
-    //   maxWidth: '1200px',
-    //   width:'90%',
-    // })
+
   }
 
   logout(){
-    // this.api.logout().subscribe((response)=>{
-    //   console.log(response);
-    // });
+
     this.api.logout();
     this.router.navigate(['/login']);
   }
+
 }

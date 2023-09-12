@@ -16,6 +16,7 @@ export class ApiService {
   likeUrl='http://localhost:3000/like';
   likedPostUrl='http://localhost:3000/getlikedpost';
   likedUserUrl='http://localhost:3000/getusers';
+  userPostsUrl='http://localhost:3000/userPost';
   // likeremoveUrl='http://localhost:3000/like/delete';
   // logoutUrl='http://localhost:3000/logout';
 
@@ -35,7 +36,6 @@ export class ApiService {
     }))
   }
   likeit(postid:any){
-    // console.log("api likeit");
     const bodyData={
       postObjectId: postid,
     }
@@ -48,34 +48,29 @@ export class ApiService {
       }),
 
     }
-    // console.log(bodyData);
     return this.http.post<any>(this.likeUrl, bodyData,  httpOptions).pipe(catchError((error)=>{
       return throwError(error);
     }));
   }
 
   addPost(formData:FormData){
-    // console.log("m api hu post ka");
+
     const accessToken=String(localStorage.getItem('accessToken'));
     const refrehToken=String(localStorage.getItem('refreshToken'));
-    // const headers={
-    //   'Authorization' : accessToken,
-    //   'Refresh-Token' : refrehToken,
-    // }
+
     const httpOptions={
       headers: new HttpHeaders({
         'Authorization' : accessToken,
         'Refresh-Token' : refrehToken,
       }),
     }
-    // console.log(httpOptions);
     return this.http.post(this.createPostUrl , formData, httpOptions).pipe(catchError((error)=>{
       return throwError(error);
     }));
   }
 
   fetchall(){
-    // console.log('cccccccc');
+
     const accessToken=String(localStorage.getItem('accessToken'));
     const refrehToken=String(localStorage.getItem('refreshToken'));
     const httpOptions={
@@ -103,6 +98,7 @@ export class ApiService {
       return throwError(error);
     }))
   }
+
   getLikedUsers(postid:any){
     const bodyData={
       postObjectId: postid,
@@ -119,12 +115,7 @@ export class ApiService {
       return throwError(error);
     }))
   }
-
-
-  removeLike(postid: any){
-    const bodyData={
-      postObjectId: postid,
-    }
+  deletePost(postid:any){
     const accessToken=String(localStorage.getItem('accessToken'));
     const refrehToken=String(localStorage.getItem('refreshToken'));
     const httpOptions={
@@ -132,30 +123,52 @@ export class ApiService {
         'Authorization' : accessToken,
         'Refresh-Token' : refrehToken,
       }),
-
     }
-    return this.http.delete(this.likeUrl,{...httpOptions,body: bodyData}).pipe(catchError((error)=>{
+    return this.http.delete(`${this.userPostsUrl}/${postid}`,httpOptions).pipe(catchError((error)=>{
       return throwError(error);
-    }))
+    }));
   }
 
-  logout(){
-    // const accessToken=String(localStorage.getItem('accessToken'));
-    // const refrehToken=String(localStorage.getItem('refreshToken'));
-    // const httpOptions={
-    //   headers: new HttpHeaders({
-    //     'Authorization' : accessToken,
-    //     'Refresh-Token' : refrehToken,
-    //   }),
+  fetchUserPost(){
+    const accessToken=String(localStorage.getItem('accessToken'));
+    const refrehToken=String(localStorage.getItem('refreshToken'));
+    const httpOptions={
+      headers: new HttpHeaders({
+        'Authorization' : accessToken,
+        'Refresh-Token' : refrehToken,
+      }),
+    }
+    return this.http.get(this.userPostsUrl,httpOptions).pipe(catchError((error)=>{
+      return throwError(error);
+    }));
+  }
 
-    // }
+  // removeLike(postid: any){
+  //   const bodyData={
+  //     postObjectId: postid,
+  //   }
+  //   const accessToken=String(localStorage.getItem('accessToken'));
+  //   const refrehToken=String(localStorage.getItem('refreshToken'));
+  //   const httpOptions={
+  //     headers: new HttpHeaders({
+  //       'Authorization' : accessToken,
+  //       'Refresh-Token' : refrehToken,
+  //     }),
+
+  //   }
+  //   return this.http.delete(this.likeUrl,{...httpOptions,body: bodyData}).pipe(catchError((error)=>{
+  //     return throwError(error);
+  //   }))
+  // }
+
+  logout(){
+
 
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('loginTime');
+    
     // return this.http.put(this.logoutUrl,httpOptions);
-
-
   }
 }
 

@@ -1,16 +1,18 @@
-<p>register works!</p>
+<!-- <p>register works!</p>
 <div class="text-center login">
   <form (ngSubmit)="onSubmit()">
-    <label> User Name: <input type="text" [(ngModel)]="username" name="username" required>
+    <label for="username"> User Name: <input type="text" [(ngModel)]="username" name="username" required>
     </label>
     <br>
     <br>
-    <label> Email: <input type="email" [(ngModel)]="email" name="email" required>
+    <label for="email"> Email: <input type="email" [(ngModel)]="email" name="email" required>
     </label>
     <br>
     <br>
-    <label> Password: <input type="password" [(ngModel)]="password" name="password" required>
-    </label>
+    <label for="password"> Password: </label>
+    <input [type]="showPassword ? 'text': 'password'" id="password" name="password" [(ngModel)]="password">
+    <input type="checkbox"  id="showPassword" [(ngModel)]="showPassword" (change)="show()">
+    <label for="showPassword">Show Password</label>
     <br>
     <br>
     <button type="submit">Submit</button>
@@ -27,4 +29,64 @@
 
 </div>
 
+ -->
 
+ <div class="register-wrapper" fxLayout="row" fxLayoutAlign="center center">
+  <mat-card class="box">
+    <mat-card-header>
+      <mat-card-title>Register</mat-card-title>
+    </mat-card-header>
+    <form [formGroup]="registrationForm" class="register-form">
+      <mat-card-content>
+        <mat-form-field class="register-full-width">
+          <input matInput placeholder="Username"  formControlName="username" required>
+          <mat-error *ngIf="registrationForm.get('username')?.invalid && registrationForm.get('username')?.hasError('required')">Username is required</mat-error>
+          <mat-error *ngIf="registrationForm.get('username')?.invalid && registrationForm.get('username')?.hasError('minlength')">Must be 4 characters</mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="register-full-width">
+          <input matInput placeholder="Email" formControlName="email">
+          <mat-error *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="registrationForm.get('email')?.invalid && registrationForm.get('email')?.hasError('email')">Invalid Email </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="register-full-width">
+          <input matInput type="{{showPassword ? 'text' : 'password'}}" placeholder="Password" formControlName="password">
+          <mat-hint align="end">{{registrationForm.get('password')?.value.length || 0}}/8</mat-hint>
+          <mat-error *ngIf="registrationForm.get('password')?.invalid && registrationForm.get('password')?.hasError('required')">Password is required</mat-error>
+          <mat-error *ngIf="registrationForm.get('password')?.invalid && registrationForm.get('password')?.hasError('minlength')">Password Must be 8 characters</mat-error>
+          <mat-icon matSuffix (click)="show(1)"> {{showPassword? 'visibility_off':'visibility'}}</mat-icon>
+        </mat-form-field>
+<br>
+
+      </mat-card-content>
+<br>
+<br>
+      <button mat-stroked-button color="accent" class="btn-block" (click)="onSubmit()" >Register</button>
+      <br>
+      <br>
+      <div class="text-center login">
+        Already have an account ? <a routerLink="/login"> Login</a> here.
+      </div>
+    </form>
+  </mat-card>
+</div>
+<div *ngIf="errorMessage">{{errorMessage}}
+
+</div>
+
+
+
+
+
+
+
+<!--
+
+<mat-form-field class="register-full-width">
+  <input matInput type="{{showPassword2 ? 'text' : 'password'}}" placeholder="Confirm Password" formControlName="password2">
+
+  <mat-error *ngIf="registrationForm.get('password2')?.invalid && registrationForm.get('password2')?.hasError('required')">Confirm Password is required</mat-error>
+  <mat-error *ngIf="registrationForm.get('password2')?.value !== registrationForm.get('password')?.value">Password Not match</mat-error>
+  <mat-icon matSuffix (click)="show(2)"> {{showPassword2 ? 'visibility_off':'visibility'}}</mat-icon>
+</mat-form-field> -->

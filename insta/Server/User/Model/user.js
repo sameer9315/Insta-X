@@ -1,16 +1,18 @@
 const mongoose=require('mongoose');
-const {model_user}=require('../constants');
+const {model_user}=require('../../Like/constants');
 const bcrypt = require('bcrypt');
-// const { generateAccessToken, generateRefreshToken } = require('../Middleware/authMiddleware');
 SALT_WORK_FACTOR = 10;
 const userSchema=new mongoose.Schema({
 
     username:{type: String, required: true },
-    email:{type: String, required: true},
-    // image:{type: String, required: true},
+    email:{
+      type: String,
+      required: true,
+      min: [5],
+      max: [32],
+      match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/]
+      },
     password: {type: String, required: true},
-    // accessToken:{type:String},
-    // RefreshToken:{type:String},
 });
 
 userSchema.pre('save', async function(next){
@@ -18,7 +20,33 @@ userSchema.pre('save', async function(next){
         this.password=await bcrypt.hash(this.password,SALT_WORK_FACTOR);
 
      }
-    // this.accessToken=generateAccessToken(this._id);
+
+    next();
+})
+
+const User=mongoose.model(model_user,userSchema);
+exports.User = User;
+
+
+
+
+
+
+
+// userSchema.methods.comparePassword = function(candidatePassword, cb) {
+//   bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
+//       if (err) return cb(err);
+//       cb(null, isMatch);
+//   });
+// };
+// userSchema.methods.validatePassword=async function validatePassword(data){
+//   return bcrypt.compare(data, this.password);
+// }
+
+
+
+    // image:{type: String, required: true},
+      // this.accessToken=generateAccessToken(this._id);
     // this.refreshToken=generateRefreshToken(this._id);
 
 
@@ -38,8 +66,4 @@ userSchema.pre('save', async function(next){
     //         next();
     //     };
     // });
-    next();
-})
-
-const User=mongoose.model(model_user,userSchema);
-exports.User = User;
+// const { generateAccessToken, generateRefreshToken } = require('../Middleware/authMiddleware');
