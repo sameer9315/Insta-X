@@ -3,9 +3,6 @@ const router=express.Router();
 const {upload}=require('../../Middleware/uloadimage');
 const tryCatchWrapper= require('../../Middleware/tryCatch');
 const {authenticateToken} = require('../../Middleware/authMiddleware');
-const mongoOperation = require('../mongoOperation');
-const { sendSucessResponse } = require('../../Middleware/response');
-const {validatePost}= require('../postValidation');
 const postController=require('../Controller/post')
 
 router.post('/' ,authenticateToken , upload.single('image'), tryCatchWrapper(postController.createPost));

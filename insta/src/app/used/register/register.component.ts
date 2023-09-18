@@ -18,7 +18,7 @@ export class RegisterComponent {
       username: ['',[Validators.required,Validators.minLength(4)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required,Validators.minLength(8)]],
-      password2:['',[Validators.required]],
+      // password2:['',[Validators.required]],
       // {Validators: this.confirmPassword.bind(this)},
     });
 
@@ -55,7 +55,10 @@ export class RegisterComponent {
     }
   }
   onSubmit() {
+    console.log('hjjj');
+    console.log(this.registrationForm)
     if(this.registrationForm?.valid){
+      console.log("hello");
       const details= this.registrationForm.value;
     this.api.signup(details).subscribe((response:any)=>{
       this.errorMessage='';

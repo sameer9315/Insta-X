@@ -1,5 +1,5 @@
 const mongoose=require('mongoose');
-
+const {model_chat, model_group}= require('../constants');
 const chatSchema=new mongoose.Schema({
   sender: {
     type: String,
@@ -8,7 +8,11 @@ const chatSchema=new mongoose.Schema({
   receiver: {
     type: String,
   },
-  groupName: String,
+  type:{
+    type: String,
+    required: true,
+  },
+  groupName:{type: String, ref:model_group}, 
   message: {
     type: String,
     required: true,
@@ -23,5 +27,5 @@ const chatSchema=new mongoose.Schema({
   }
 })
 
-const Message= mongoose.model('Message', chatSchema);
+const Message= mongoose.model(model_chat, chatSchema);
 exports.Message=Message;

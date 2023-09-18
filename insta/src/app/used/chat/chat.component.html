@@ -70,7 +70,7 @@
       </div>
       <div class="messages">
         <div *ngIf="!selectedGroup">
-          <div *ngFor="let message of getpersonalChat()">
+          <div *ngFor="let message of messageList">
             <div *ngIf="message.sender===username" class="message-sent">
                 {{message.message}}
             </div>
@@ -80,6 +80,7 @@
             </div>
         </div>
       </div>
+      
       </div>
       <div class="input-area">
         <input [(ngModel)]="newMessage"
@@ -89,25 +90,15 @@
       </ng-container>
 
       <ng-container *ngIf="selectedGroup">
-        <!-- <h3> Group Members</h3>
-          <ul>
-            <li *ngFor="let member"></li>
-          </ul> -->
           <h3>Group Chat-{{selectedGroup}}</h3>
         <button  (click)="leaveGroup()">Leave Group</button>
         <button (click)="groupMembersView()">View Joined Members</button>
 
           <div *ngFor="let message of groupChatMessages">
-            <div *ngIf="message.noti ; else sent">
+            <div *ngIf="message.type==='notification'; else sent">
               <div class="notification">
-              <span *ngIf="message.group===selectedGroup  ">
-                {{message.noti}}
-                <span *ngIf="message.type==='join';else left">
-                  Joined The {{message.group}} Group
-                </span>
-                <ng-template #left>
-                  Left The {{message.group}} Group
-                </ng-template>
+              <span *ngIf="message.groupName===selectedGroup  ">
+                {{message.sender}} {{message.message}}
               </span>
             </div>
             </div>
@@ -125,6 +116,7 @@
               </ng-template>
             </ng-template>
           </div>
+          
           <div class="input-area">
             <input [(ngModel)]="newMessage"
             (keyup)="$event.keyCode == 13 && sendMessage()">

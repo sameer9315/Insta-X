@@ -17,6 +17,8 @@ export class ApiService {
   likedPostUrl='http://localhost:3000/getlikedpost';
   likedUserUrl='http://localhost:3000/getusers';
   userPostsUrl='http://localhost:3000/userPost';
+  groupsUrl='http://localhost:3000/groups';
+  chatsUrl='http://localhost:3000/chats';
   // likeremoveUrl='http://localhost:3000/like/delete';
   // logoutUrl='http://localhost:3000/logout';
 
@@ -85,6 +87,21 @@ export class ApiService {
     ));
   }
 
+  getGroups(){
+    console.log('hello Groups get api called');
+    const accessToken=String(localStorage.getItem('accessToken'));
+    const refrehToken=String(localStorage.getItem('refreshToken'));
+    const httpOptions={
+      headers: new HttpHeaders({
+        'Authorization' : accessToken,
+        'Refresh-Token' : refrehToken,
+      }),
+    }
+    return this.http.get(this.groupsUrl,httpOptions).pipe(catchError((error)=>{
+      return throwError(error);
+    }))
+  }
+
   getPostsLiked(){
     const accessToken=String(localStorage.getItem('accessToken'));
     const refrehToken=String(localStorage.getItem('refreshToken'));
@@ -97,6 +114,25 @@ export class ApiService {
     return this.http.get(this.likedPostUrl,httpOptions).pipe(catchError((error)=>{
       return throwError(error);
     }))
+  }
+
+  getchats(selectedRecipeient: any){
+    // const bodyData={
+    //   type: selectedRecipeient.type,
+    //   name: selectedRecipeient.name,
+    // }
+    const accessToken=String(localStorage.getItem('accessToken'));
+    const refrehToken=String(localStorage.getItem('refreshToken'));
+    const httpOptions={
+      headers: new HttpHeaders({
+        'Authorization' : accessToken,
+        'Refresh-Token' : refrehToken,
+      }),
+    }
+    return this.http.post(this.chatsUrl,selectedRecipeient, httpOptions).pipe(catchError((error)=>{
+      return throwError(error);
+    }))
+
   }
 
   getLikedUsers(postid:any){

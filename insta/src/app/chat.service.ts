@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { io } from "socket.io-client";
 import { Socket } from 'socket.io';
+import { Subject } from 'rxjs';
 
 
 @Injectable({
@@ -13,11 +14,14 @@ export class ChatService {
   public messages: any;
   constructor() {}
   groupMembers:string[]=[];
+  private personalMessageSubject= new Subject<any>();
+  private groupMessageSubject= new Subject<any>();
+
 
   socket = io('http://localhost:3003');
 
   public sendMessage(message: any) {
-    console.log('sendMessage: ', message)
+    console.log('sendMessage: ', message);
     this.socket.emit('message', message);
     
   }
@@ -30,13 +34,7 @@ export class ChatService {
       console.log(this.groupMembers);
     })
   }
-  // onGroupMembers(){
-  //   return this.socket.emit('groupMembers');
-  // }
-  // updateGroupMembers(members:string[]){
-  //   this.groupMembers=members;
-  // }
-
+  
 
   getGroupList(callback:(groups:string[])=>void):void{
     this.socket.on('groupList',(groups: string[])=>{
@@ -78,14 +76,36 @@ export class ChatService {
       callback(users);
     })
   }
+  onPersonalMessage(): Subject<any>{
+    console.log('Helllo personal  essage recived');
+    this.socket.on('privateMessage',(message)=>{
+      this.personalMessageSubject.next(message);
+    })
+    return this.personalMessageSubject;
+  }
+
+ongroupChat(): Subject<any>{
+  // console.log('hellloooo groupchat');
+  this.socket.on('chatMessage',(message)=>{
+    // console.log('Recieved GroupMessage:', message);
+    this.groupMessageSubject.next(message);
+  })
+  return this.groupMessageSubject;
+}
 
   ongroupMessage(callback: (message:any)=>void):void{
+    console.log('group Messages');
+    console.log(this.socket.on('chatMessage',(data)=>{
+      
+    }))
     this.socket.on('chatMessage',(data)=>{
+      console.log(data);
       callback(data);
     })
   }
 
   onPrivateMessage(callback: (message:any)=>void):void{
+    console.log('hello private');
     this.socket.on('privateMessage',(data)=>{
       console.log('Recieved: ', data);
       callback(data);

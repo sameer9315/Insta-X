@@ -3,6 +3,8 @@ const mongoose= require('mongoose');
 const app = express();
 const users = require('./User/Routes/users');
 const signin = require('./User/Routes/signin');
+const groups=require('./Chat/Routes/groupFetch');
+const chats= require('./Chat/Routes/chatFetch');
 const posts= require('./Post/Routes/posts');
 const like= require('./Like/Routes/like');
 const fetchPost= require('./Post/Routes/fetchPost');
@@ -64,7 +66,8 @@ app.use('/fetch',fetchPost);
 app.use('/getlikedpost',getliked);
 app.use('/getusers',postlikeduser);
 app.use('/userPost',postUsers);
-
+app.use('/groups',groups);
+app.use('/chats',chats);
 // app.use('/chat',chatApp);
 
 // io.on('connection',(socket)=>{
