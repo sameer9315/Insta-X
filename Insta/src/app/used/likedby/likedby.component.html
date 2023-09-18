@@ -1,0 +1,11 @@
+<p>likedby works!</p>
+
+<div *ngIf="err; else datas"> No Likes..</div>
+<ng-template #datas>
+  <div *ngFor="let like of likedUser">
+    <p>{{like.user}}</p>
+  </div>
+
+</ng-template>
+
+

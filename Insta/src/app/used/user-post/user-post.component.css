@@ -1,0 +1,36 @@
+.image-item{
+  width: 60%;
+  height: 80%;
+  object-fit: cover;
+  margin: 10px;
+}
+.filler{
+  flex:1;
+}
+.person-icon{
+  margin-left: 10px;
+}
+.toolbar{
+  background-color: transparent;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 64px;
+}
+
+.centre-text{
+  font-size: large;
+  font-family: cursive;
+  display: flex;
+  margin-inline: 40%;
+}
+
+.liked{
+  color: red;
+}
+
+.show-more{
+  cursor: pointer;;
+  font-weight: bolder;
+  color: black;
+}

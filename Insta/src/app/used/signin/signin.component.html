@@ -1,0 +1,33 @@
+
+
+<div  class="login-wrapper" fxLayout="row" fxLayoutAlign="center center">
+  <mat-card class="box">
+    <mat-card-header>
+      <mat-card-title>Log in</mat-card-title>
+    </mat-card-header>
+    <form [formGroup]="loginForm" class="login-form">
+      <mat-card-content>
+        <mat-form-field class="login-full-width">
+          <input matInput placeholder="Username" formControlName="username">
+          <mat-error *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.hasError('required')">Username is required</mat-error>
+
+        </mat-form-field>
+        <mat-form-field class="login-full-width">
+          <input matInput type="{{showPassword ? 'text' : 'password'}}" placeholder="Password" formControlName="password">
+          <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.hasError('required')">Password is required</mat-error>
+          <!-- <mat-error *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.hasError('minlength')">Password Must be 8 characters</mat-error> -->
+          <mat-icon matSuffix (click)="show()"> {{showPassword? 'visibility_off':'visibility'}}</mat-icon>
+        </mat-form-field>
+        <br>
+      </mat-card-content>
+      <button mat-stroked-button color="accent" (click)="onSubmit()" class="btn-block">Log in</button>
+      <br>
+      <br>
+      <div *ngIf="errorMessage">{{errorMessage}}</div>
+      <br>
+      <br>
+      <button mat-stroked-button color="primary" class="btn-block" routerLink="/signup" type="submit">Sign Up</button>
+
+    </form>
+  </mat-card>
+</div>
