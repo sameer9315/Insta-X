@@ -13,23 +13,17 @@ const {privateMessage,disconnect,chatStartMessage,logout,
 
 
 async function initializeGroupFromDatabase(){
-  try{
     const allGroups=await Group.find().populate('members');
     allGroups.forEach((group)=>{
       const groupMembers= new Set(group.members.map((member)=>member));
-      console.log(groupMembers);
       groups.set(group.groupName,groupMembers);
-      console.log(groups);
     });
-  }catch(error){
-    console.error('Eroor Initialize')
-  }
+ 
 }
 
 initializeGroupFromDatabase();
 
 io.on(connection,(socket)=>{
-  // console.log('User-Connected: ',socket.id);   
 
   socket.on(connected,(username)=>{
     connectedUsers.set(socket.id,username);
@@ -49,7 +43,7 @@ io.on(connection,(socket)=>{
       groups.get(groupName).add(username);
       socket.join(groupName);
       const joined=dbOperations.joinGroup(username, groupName);
-      io.to(groupName).emit(members,Array.from(groups.get(groupName)));
+      // io.to(groupName).emit(members,Array.from(groups.get(groupName)));
       io.to(groupName).emit(groupJoined,{
         username,
         groupName,
@@ -65,22 +59,15 @@ io.on(connection,(socket)=>{
 
 
   socket.on(message, async (data)=>{
-    console.log('Hellllo')
-    // const senderUsername=connectedUsers.get(socket.id);
-    // console.log(connectedUsers);
     const {groupName, message,sender}=data;
     if(groupName){
-    console.log(groupName);
 
         const receiver={
           groupName: groupName
         }
       const savedMessage=await dbOperations.saveMessage(sender,receiver, message, socket.id, type='GroupMessage');
-      // console.log(groups);
       
-      // console.log(io.to(groupName).emit('chatMessage',{groupName: data.groupName,sender: data.sender,message:data.message}))
-      io.emit('chatMessage',{groupName: data.groupName,sender: data.sender,message:data.message});
-      console.log(savedMessage);
+      io.emit(chatMessage,{groupName: data.groupName,sender: data.sender,message:data.message});
 
     }else{
     const recipientSocketId=Array.from(

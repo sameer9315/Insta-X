@@ -1,4 +1,4 @@
-import { Component,OnInit ,ChangeDetectorRef,NgZone, HostListener} from '@angular/core';
+import { Component,OnInit ,ElementRef,AfterViewChecked,ViewChild,HostListener} from '@angular/core';
 // import * as io from 'socket.io-client'
 import { ChatService } from '../../chat.service';
 import { Router } from '@angular/router';
@@ -6,12 +6,15 @@ import { ApiService } from 'src/app/api.service';
 import { SharedService } from 'src/app/shared.service';
 import { Subscription } from 'rxjs';
 import { response } from 'express';
+import { not } from 'joi';
+import { visitAll } from '@angular/compiler';
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css']
 })
-export class ChatComponent  {
+export class ChatComponent implements AfterViewChecked  {
+  @ViewChild('messages')messagesContainer?: ElementRef;
   us='username';
   newMessage= '';
   messageList: any[] = [];
@@ -26,24 +29,29 @@ export class ChatComponent  {
   joinedGroups: string[]=[];
   joinedGroup:string='';
   selectedGroupMembers: string[]=[];
-  allGroupDetails: any[]=[];
+  allGroupDetails: any;
+  viewMembers=false;
+  noti='notification';
+  joinMessage='Joined The Group';
+  leaveMessage='Left The Group';
+  messageChunkSize=20;
+  totalMessageView=this.messageChunkSize;
+  scrolledToTop=false;
 
   
  private userJoinedSubscription: Subscription | undefined;
   private userleftSubscription: Subscription | undefined;
-  // messageSubscription: Subscription | undefined;
 
 
   constructor(private chatService: ChatService,private router: Router,private api: ApiService, private shared: SharedService){
     this.chatService.emitUserConnected(String(localStorage.getItem(this.us)));
     this.chatService.getActiveUsers((users:string[])=>{
       this.activeUsers=users.filter(user=>user!==localStorage.getItem(this.us));
-      console.log(users);
+      // console.log(users);
     });
-    // this.chatService.getGroupList((groups:string[])=>{
-    //   this.groupList=groups;
-    //   console.log(this.groupList);
-    // })
+    this.chatService.getGroupList((groups:string[])=>{
+      this.groupList=groups;
+    })
     
     this.api.getGroups().subscribe((response:any)=>{
       this.allGroupDetails=response;
@@ -53,37 +61,33 @@ export class ChatComponent  {
           this.joinedGroups.push(group.groupName);
         }
       });
-      console.log(response);
+      // console.log(response);
      },(error)=>{
       this.api.logout();
       this.router.navigate(['/login']);
     });
 
   }
+  ngAfterViewChecked(): void {
+    this.scrollToBottom();
+  }
+  scrollToBottom(){
+    const container=this.messagesContainer?.nativeElement;
+    container.scrollTop=container.scrollHeight;
+  }
 
   ngOnInit():void {
-
-    if(!localStorage.getItem(this.us)){
+   if(!localStorage.getItem(this.us)){
     this.api.logout();
     this.router.navigate(['/login']);
     }else{
+      
       this.username=localStorage.getItem(this.us);
       this.chatService.onPersonalMessage().subscribe((message)=>{
           this.messageList.push(message);
 
       })
-    // this.subscribeToGroupMessage();
-
-      // this.chatService.ongroupChat().subscribe((message)=>{
-      //   console.log('HEllllooooo group')
-      //   this.groupChatMessages.push(message);
-      //   console.log(this.groupChatMessages);
-
-      // })
-      // this.chatService.onPrivateMessage((message)=>{
-      //   console.log('hlo personl msgl');
-      //     this.messageList.push(message);
-      // });
+    
       this.chatService.ongroupMessage((message)=>{
         this.groupChatMessages.push(message);
       });
@@ -93,32 +97,27 @@ export class ChatComponent  {
     }
 
   }
-
-  // subscribeToGroupMessage(){
-  //   console.log('subscribesddddd')
-  //   this.chatService.ongroupMessage((message)=>{
-  //     this.groupChatMessages.push(message);
-  //     console.log('Message Helllo Geoup', this.groupChatMessages);
-  //   })
-  // }
-
-
-
-  // @HostListener('scroll',['$event'])
+  //   @HostListener('scroll',['$event'])
   // onScroll(event: Event){
   //   const chatWindow=event.target as HTMLElement;
-  //   this.scrollToTop=chatWindow.scrollTop===0;
+  //   this.scrolledToTop=chatWindow.scrollTop===0;
   // }
 
   // loadOlderMessage(){
-  //   this.totalDisplayMessages+=this.messageChunkSize;
+  //   this.totalMessageView+=this.messageChunkSize;
   // }
+
 
   groupMembersView(){
     if(this.selectedGroup){
-      console.log(this.selectedGroup);
-      console.log(this.selectedGroupMembers)
+      this.viewMembers=true;
+      this.selectedGroupMembers=this.allGroupDetails.message.filter((group:any)=>group.groupName===this.selectedGroup)[0].members;
+      // console.log(this.selectedGroupMembers)
     }
+  }
+
+  closeMembersView(){
+    this.viewMembers=false;
   }
 
   ngOnDestroy():void{
@@ -135,10 +134,10 @@ export class ChatComponent  {
     this.userJoinedSubscription=this.chatService.onUserJoined().subscribe((data:any)=>{
       if(data.groupName){
         this.groupChatMessages.push({
-          type: 'notification',
+          type: this.noti,
           sender: this.username,
           groupName: data.groupName,
-          Message : 'Joined The Group',
+          Message : this.joinMessage,
         });
         if(!this.joinedGroups.includes(data.groupName)){
           this.joinedGroups.push(data.groupName);
@@ -149,10 +148,10 @@ export class ChatComponent  {
   subscribeToUserLeft():void{
     this.userleftSubscription=this.chatService.onLeaveGroup().subscribe((data:any)=>{
           this.groupChatMessages.push({
-            type: 'notification',
+            type: this.noti,
           sender: this.username,
           groupName: data.groupName,
-          Message : 'Left The Group',
+          Message : this.leaveMessage,
           })
       })
   }
@@ -201,12 +200,9 @@ export class ChatComponent  {
       this.chatService.leave(data);
       const index=this.joinedGroups.indexOf(this.selectedGroup);
       this.joinedGroups.splice(index,1);
-      // this.chatService.onLeaveGroup().subscribe((data:any)=>{
-      //   console.log(data);
-      // })
+      
       this.selectedGroup='';
     }
-
     }
   }
 
@@ -228,8 +224,7 @@ export class ChatComponent  {
       response.message.forEach((message: any)=>{
         this.messageList.push(message);
       })
-      console.log(response);
-      console.log(this.messageList);
+      
     });
     this.selectedRecipientSocketId=recipientSocketId;
   }
@@ -246,20 +241,15 @@ export class ChatComponent  {
         message: this.newMessage,
         reciever: this.selectedRecipientSocketId,
       });
-      console.log(this.messageList);
+      // console.log(this.messageList);
     }else{
       this.chatService.sendMessage({
         groupName: this.groupName,
         message: this.newMessage,
         sender: localStorage.getItem(this.us)
       })
-      // this.groupChatMessages.push({
-      //   sender: localStorage.getItem(this.us),
-      //   message: this.newMessage,
-      //   groupName: this.groupName
-      // })
+     
     }
-    console.log(this.groupChatMessages);
     this.newMessage = '';
   }
   logout(){
@@ -270,7 +260,44 @@ export class ChatComponent  {
   }
 }
 
+// this.chatService.onLeaveGroup().subscribe((data:any)=>{
+      //   console.log(data);
+      // })
 
+// console.log(response);
+      // console.log(this.messageList);
+  // subscribeToGroupMessage(){
+  //   console.log('subscribesddddd')
+  //   this.chatService.ongroupMessage((message)=>{
+  //     this.groupChatMessages.push(message);
+  //     console.log('Message Helllo Geoup', this.groupChatMessages);
+  //   })
+  // }
+
+
+
+  // @HostListener('scroll',['$event'])
+  // onScroll(event: Event){
+  //   const chatWindow=event.target as HTMLElement;
+  //   this.scrollToTop=chatWindow.scrollTop===0;
+  // }
+
+  // loadOlderMessage(){
+  //   this.totalDisplayMessages+=this.messageChunkSize;
+  // }
+
+// this.subscribeToGroupMessage();
+
+      // this.chatService.ongroupChat().subscribe((message)=>{
+      //   console.log('HEllllooooo group')
+      //   this.groupChatMessages.push(message);
+      //   console.log(this.groupChatMessages);
+
+      // })
+      // this.chatService.onPrivateMessage((message)=>{
+      //   console.log('hlo personl msgl');
+      //     this.messageList.push(message);
+      // });
 // const message={
 
 // }

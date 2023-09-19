@@ -88,7 +88,7 @@ export class ApiService {
   }
 
   getGroups(){
-    console.log('hello Groups get api called');
+    // console.log('hello Groups get api called');
     const accessToken=String(localStorage.getItem('accessToken'));
     const refrehToken=String(localStorage.getItem('refreshToken'));
     const httpOptions={

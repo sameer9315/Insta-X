@@ -64,7 +64,6 @@ async function leaveGroup(user,groupName){
 
 
 async function getMessage(req){
-  console.log('hello from getMessage');
   let user=await User.findById(req.user.userId);
   if(!user){
     throw createError(400, userError);
