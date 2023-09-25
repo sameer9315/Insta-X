@@ -7,16 +7,24 @@ import { response } from 'express';
 import { LikedbyComponent } from '../likedby/likedby.component';
 import { ChatComponent } from '../chat/chat.component';
 
+import {MatPaginatorModule} from '@angular/material/paginator';
+// import { number } from 'joi';
+
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css'],
   providers:[MatDialog],
+  // standalone: true,
+  // imports: [MatPaginatorModule]
 })
 export class HomeComponent {
 
-  posts: any;
+  posts?: any;
+  totalPosts?: number;
+  postsToDisplay:any[]=[];
+  pageSize:number=2;
   errorMessage: any;
   imageurl='http://localhost:3000/uploads/';
   likedPost: any;
@@ -35,13 +43,16 @@ export class HomeComponent {
 
   ngOnInit(): void {
     this.posts=null;
+
     this.likedby=[];
     this.othersCountArray=[];
      this.api.fetchall().subscribe((response:any)=>{
       this.posts=response.message;
+      this.totalPosts=this.posts.length;
+      this.postsToDisplay=this.posts.slice(0,2);
+      // console.log(this.postsToDisplay);
       this.errorMessage='';
       this.fetchpostLiked();
-      // console.log(this.posts)
       this.fetchpostLike();
      },(error)=>{
       this.api.logout();
@@ -57,6 +68,12 @@ export class HomeComponent {
   }
   closeEnlargedImage(){
     this.enlargedImage=null;
+  }
+
+  onPageChange(event:any){
+    const startIndex=event.pageIndex * event.pageSize;
+    const endIndex=startIndex + event.pageSize;
+    this.postsToDisplay=this.posts.slice(startIndex,endIndex);
   }
 
   getLikedBy(postid:any){
