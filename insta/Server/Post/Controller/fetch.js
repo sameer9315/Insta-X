@@ -4,7 +4,9 @@ const { sendResponse } = require('../../Middleware/response');
 
 module.exports={
   fetchPost: async(req,res)=>{
-    const result= await mongoOperation.fetchPost();
+    // console.log(req.body.page);
+    const result= await mongoOperation.fetchPost(req);
+    // console.log(result);
     sendResponse(res,res.statusCode,result);
   },
   fetchParticularUserPost: async(req,res)=>{

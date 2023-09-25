@@ -20,6 +20,9 @@ const model_group='Group';
 const errorGroup='Group Not Found';
 const errorMember='Not in Group';
 const errorMemberAlready='Already In Group';
+const deleteGroup='groupDelete';
+const not_found='Group Not Found';
+const adminError='Not Admin';
 module.exports={privateMessage,disconnect,chatStartMessage,logout,
     userLeft,leaveGroup,connection,message,chatMessage,groupJoined,
-    getGroupMembers,members,joinGroup,groupList,connected,users,createGroup,model_chat,errorMember,errorMemberAlready,model_group,errorGroup};
+    getGroupMembers,members,not_found,adminError,joinGroup,groupList,connected,users,deleteGroup,createGroup,model_chat,errorMember,errorMemberAlready,model_group,errorGroup};

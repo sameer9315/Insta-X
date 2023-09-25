@@ -75,6 +75,10 @@ export class ChatService {
       })
     })
   }
+
+  deleteGroup(data:any){
+    this.socket.emit('groupDelete',data);
+  }
   leave(data:any):void{
     this.socketEmitter(this.groupLeave,data);
   }

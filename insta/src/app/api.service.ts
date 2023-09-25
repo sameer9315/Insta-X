@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import{HttpClient, HttpErrorResponse, HttpHeaders} from '@angular/common/http';
+import{HttpClient, HttpErrorResponse, HttpHeaders, HttpParams} from '@angular/common/http';
 import{catchError} from 'rxjs/operators';
 import{throwError} from 'rxjs'
 
@@ -71,7 +71,7 @@ export class ApiService {
     }));
   }
 
-  fetchall(){
+  fetchall(page: number, pageSize: number){
 
     const accessToken=String(localStorage.getItem('accessToken'));
     const refrehToken=String(localStorage.getItem('refreshToken'));
@@ -81,7 +81,12 @@ export class ApiService {
         'Refresh-Token' : refrehToken,
       }),
     }
-    return this.http.get(this.postsUrl,httpOptions).pipe(catchError((error)=>{
+    const bodyData={
+      page,
+      pageSize
+    }
+  
+    return this.http.post(this.postsUrl,bodyData,httpOptions).pipe(catchError((error)=>{
       return throwError(error);
     }
     ));

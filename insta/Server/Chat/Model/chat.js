@@ -12,7 +12,8 @@ const chatSchema=new mongoose.Schema({
     type: String,
     required: true,
   },
-  groupName:{type: String, ref:model_group}, 
+  groupName:{type: String, ref:model_group},
+  groupId: {type: String, ref: model_group}, 
   message: {
     type: String,
     required: true,

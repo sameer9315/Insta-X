@@ -46,9 +46,15 @@ export class HomeComponent {
 
     this.likedby=[];
     this.othersCountArray=[];
-     this.api.fetchall().subscribe((response:any)=>{
-      this.posts=response.message;
-      this.totalPosts=this.posts.length;
+    this.fetchPosts(1);
+     
+  }
+
+  fetchPosts(page: number){
+    this.api.fetchall(page,2).subscribe((response:any)=>{
+      this.posts=response.message.posts;
+      console.log(response);
+      this.totalPosts=response.message.totalPosts;
       this.postsToDisplay=this.posts.slice(0,2);
       // console.log(this.postsToDisplay);
       this.errorMessage='';
@@ -58,6 +64,7 @@ export class HomeComponent {
       this.api.logout();
       this.router.navigate(['/login']);
     });
+
   }
 
   toggleCaption(postid:string){
@@ -71,9 +78,11 @@ export class HomeComponent {
   }
 
   onPageChange(event:any){
+    console.log(event.pageIndex);
+    this.fetchPosts(event.pageIndex+1);
     const startIndex=event.pageIndex * event.pageSize;
     const endIndex=startIndex + event.pageSize;
-    this.postsToDisplay=this.posts.slice(startIndex,endIndex);
+    // this.postsToDisplay=this.posts.slice(startIndex,endIndex);
   }
 
   getLikedBy(postid:any){

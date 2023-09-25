@@ -5,10 +5,22 @@ const {not_found,userError,sucess_del}= require('./constants');
 const createError=require('http-errors');
 
 
+// const posts=await Post.find().sort({_id:-1}).lean().exec();
+
+
+
+
 module.exports={
-  fetchPost: async()=>{
-    const posts=await Post.find().sort({_id:-1}).lean().exec();
-    return posts;
+  fetchPost: async(req)=>{
+
+    const page= parseInt(req.body.page) ||1;
+    const pageSize=parseInt(req.body.pageSize)||2;
+    const startIndex=(page-1)*pageSize;
+    const endIndex=page*pageSize;
+    const posts=await Post.find().sort({_id:-1}).skip(startIndex).limit(pageSize).lean().exec();
+    const totalPosts= await Post.countDocuments();
+    console.log(totalPosts,posts);
+    return {posts, totalPosts};
   },
   fetchUserPosts: async(req)=>{
   let user=await User.findById(req.user.userId);

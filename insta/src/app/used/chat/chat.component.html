@@ -1,20 +1,3 @@
-<!-- <div  *ngIf="messageList?.length===0; else avl">
-  <strong>Start the Chat </strong>
-  <h1>helloo</h1>
-</div>
-<ng-template #avl> -->
-  <!-- <div *ngFor="let message of messageList">
-    <li>
-        {{message}}
-    </li>
-  </div>
-
-<input
-  [(ngModel)]="newMessage"
-  (keyup)="$event.keyCode == 13 && sendMessage()"
-/>
-<button (click)="sendMessage()">Send Message</button> -->
-
 
 <mat-toolbar class="toolbar stickyBar">
   <button mat-icon-button routerLink="/posts">
@@ -52,9 +35,10 @@
     <h3>Available Groups</h3>
     <ul>
       <li *ngFor="let group of groupList">
-        {{group}}
-        <span *ngIf="groupJoinedChecker(group)"> : Already Joined</span>
-        <button *ngIf="!groupJoinedChecker(group)" (click)="joinGroup(group)">Join</button>
+        {{group.groupName}}
+        <span *ngIf="groupJoinedChecker(group.groupName)"> : Already Joined</span>
+        <button *ngIf="!groupJoinedChecker(group.groupName)" (click)="joinGroup(group.groupName)">Join</button>
+        <button *ngIf="group.admin===username" (click)="deleteGroup(group.groupName)">Delete Group</button>
       </li>
     </ul>
   </div>

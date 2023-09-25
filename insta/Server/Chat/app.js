@@ -9,7 +9,7 @@ const connectedUsers=new Map();
 const groups=new Map();
 const {privateMessage,disconnect,chatStartMessage,logout,
   userLeft,leaveGroup,connection,message,chatMessage,
-  groupJoined,getGroupMembers,members,joinGroup,groupList,connected,users,createGroup}= require('./constants');
+  groupJoined,getGroupMembers,deleteGroup,members,joinGroup,groupList,connected,users,createGroup}= require('./constants');
 
 
 async function initializeGroupFromDatabase(){
@@ -106,6 +106,13 @@ io.on(connection,(socket)=>{
     if(groups.has(grouName)){
       const members=Array.from(groups.get(grouName));
       socket.emit(members,members);
+    }
+  })
+
+  socket.on(deleteGroup,(data)=>{
+    console.log("Hello Dlete Group Called");
+    if(groups.has(data.groupName)){
+      dbOperations.deleteGroup(data);
     }
   })
 

@@ -8,6 +8,6 @@ const {sendSucessResponse}= require('../../Middleware/response');
 const post=require('../Controller/fetch')
 
 
-router.get('/', authenticateToken, tryCatchWrapper(post.fetchPost));
+router.post('/', authenticateToken, tryCatchWrapper(post.fetchPost));
 
 module.exports=router;

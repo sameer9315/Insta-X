@@ -22,7 +22,7 @@ export class ChatComponent implements AfterViewChecked  {
   activeUsers: string[]=[];
   selectedRecipientSocketId:string='';
   selectedRecipient:string='';
-  groupList: string[]=[];
+  groupList: any[]=[];
   groupName: string='';
   selectedGroup: string='';
   groupChatMessages:any[]=[];
@@ -49,14 +49,14 @@ export class ChatComponent implements AfterViewChecked  {
       this.activeUsers=users.filter(user=>user!==localStorage.getItem(this.us));
       // console.log(users);
     });
-    this.chatService.getGroupList((groups:string[])=>{
-      this.groupList=groups;
-    })
+    // this.chatService.getGroupList((groups:any[])=>{
+    //   this.groupList=groups;
+    // })
     
     this.api.getGroups().subscribe((response:any)=>{
       this.allGroupDetails=response;
       response.message.forEach((group:any) => {
-        this.groupList.push(group.groupName);
+        this.groupList.push({groupName:group.groupName,admin: group.admin});
         if(group.members.includes(this.username)){
           this.joinedGroups.push(group.groupName);
         }
@@ -96,6 +96,13 @@ export class ChatComponent implements AfterViewChecked  {
       this.subscribeToUserLeft();
     }
 
+  }
+
+
+  deleteGroup(groupName:any){
+    
+    this.chatService.deleteGroup({groupName, username: this.username})
+    console.log(groupName,this.username);
   }
   //   @HostListener('scroll',['$event'])
   // onScroll(event: Event){
@@ -158,6 +165,10 @@ export class ChatComponent implements AfterViewChecked  {
   createGroup(){
     if(this.groupName){
     this.chatService.createGroup(this.groupName);
+    this.groupList.push({
+      groupName: this.groupName,
+      admin: this.username,
+    })
     }
     this.groupName='';
   }

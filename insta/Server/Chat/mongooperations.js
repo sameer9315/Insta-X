@@ -3,6 +3,9 @@ const {Group}= require('./Model/group');
 const tryCatchWrapper= require('../Middleware/tryCatch');
 const { User} = require('../User/Model/user');
 
+const createError=require('http-errors');
+
+const {adminError,not_found}= require('./constants');
 
 async function saveMessage(sender, receiver, message, socketId,type){
   if(receiver.groupName){
@@ -27,12 +30,31 @@ async function createGroup(groupName, admin){
   await group.save();
   return group;
 }
+async function deleteGroup(data){
+  const group=await Group.findOne({groupName: data.groupName});
+  console.log(group);
+
+  if(!group){
+    // console.error('Group Not Found');
+    throw createError(404,not_found);
+    // return;
+  }
+  if(group.admin===data.username){
+    console.log("Hello Deleteing")
+    const deleteGrp=await Group.findOneAndRemove({groupName: data.groupName});
+    const deleteMessages= await Message.deleteMany({groupName: data.groupName});
+
+  }else{
+    throw createError(404,adminError);
+  }
+
+}
 
 async function joinGroup(user,groupName){
   const group=await Group.findOne({groupName: groupName});
   if(!group){
-    console.error('Group Not Found');
-    return;
+    throw createError(404,not_found);
+    // return;
   }
   if(group.members.includes(user)){
     console.log('Already In group');
@@ -95,5 +117,5 @@ async function getGroups(){
 module.exports={
   saveMessage,
   getMessage,
-  createGroup,joinGroup,leaveGroup,getGroups
+  createGroup,joinGroup,leaveGroup,getGroups,deleteGroup
 }
